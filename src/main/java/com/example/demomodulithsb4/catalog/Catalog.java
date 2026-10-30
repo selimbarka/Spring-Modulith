@@ -1,5 +1,7 @@
 package com.example.demomodulithsb4.catalog;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import com.example.demomodulithsb4.catalog.internal.CoffeeEntity;
 import com.example.demomodulithsb4.catalog.internal.CoffeeRepository;
@@ -19,5 +21,15 @@ public class Catalog {
         CoffeeEntity saved = repository.save(new CoffeeEntity(name, price));
         events.publishEvent(new CoffeeCreated(saved.getId(), saved.getName()));
         return saved.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CoffeeView> findAll() {
+        return repository.findAll().stream()
+                .map(c -> new CoffeeView(c.getId(), c.getName(), c.getPrice()))
+                .toList();
+    }
+
+    public record CoffeeView(Long id, String name, int price) {
     }
 }
